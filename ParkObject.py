@@ -1,7 +1,7 @@
 class ParkObject:
-  def __init__(self, canvas, x1, y1, x2, y2, color, width):
-    self.canvas = canvas
-    self.id = self.canvas.create_line(x1, y1, x2, y2, fill=color, width=width)
+    def __init__(self, canvas):
+        self.canvas = canvas
+        self.id = None  # No object created by default
 
-  def get_id(self):
-    return self.id
+    def get_id(self):
+      return self.id
