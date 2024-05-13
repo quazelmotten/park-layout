@@ -3,6 +3,7 @@ from ParkObject import ParkObject  # Import ParkObject from the objects folder
 from objects.Road import Road  # Import Road from the objects folder
 from objects.Border import Border
 from objects.Entrance import Entrance
+from objects.Prohibited import ProhibitedZone
 
 class ParkLayout:
     def __init__(self):
@@ -13,6 +14,7 @@ class ParkLayout:
         # self.current_object = None  # Initially no object selected
         self.current_border = None  # Initially no border object being created
         self.current_road = None
+        self.current_prohibited = None
         self.start_x = None
         self.start_y = None
         self.is_starting = False
@@ -20,16 +22,19 @@ class ParkLayout:
         self.menu_frame = tk.Frame(self.window, width=100, height=500, bg="lightgray")
         self.menu_frame.pack(side="left")
 
+        #TODO Remove the bloat
         # Load button icons
-        self.road_icon = self.create_image("road.png")
-        self.border_icon = self.create_image("border.png")
-        self.entrance_icon = self.create_image("entrance.png")
+        self.road_icon = self.create_image("icons\\road.png")
+        self.border_icon = self.create_image("icons\\border.png")
+        self.entrance_icon = self.create_image("icons\\entrance.png")
+        self.prohibited_icon = self.create_image("icons\\prohibited.png")
 
         self.canvas = tk.Canvas(self.window, width=500, height=500)
         self.canvas.bind("<Button-1>", self.handle_click_on_canvas)
         self.canvas.pack()
 
         # Create buttons (with icons)
+
         self.current_object = None
         self.road_button = tk.Button(self.menu_frame, text="Road", image=self.road_icon, compound=tk.LEFT, command=lambda: self.set_object("road"), bg="lightgray")
         self.road_button.pack(pady=10)
@@ -37,10 +42,13 @@ class ParkLayout:
         self.border_button.pack(pady=10)
         self.entrance_button = tk.Button(self.menu_frame, text="Entrance", image=self.entrance_icon, compound=tk.LEFT, command=lambda: self.set_object("entrance"), bg="lightgray")
         self.entrance_button.pack(pady=10)
-          # Create buttons with proper event binding
+        self.prohibited_button = tk.Button(self.menu_frame, text="Prohibited", image=self.prohibited_icon, compound=tk.LEFT, command=lambda: self.set_object("prohibited"), bg="lightgray")
+        self.prohibited_button.pack(pady=10)
+        # Create buttons with proper event binding
         self.road_button.bind("<Button-1>", self.set_object("road"))
         self.border_button.bind("<Button-1>", self.set_object("border"))
         self.entrance_button.bind("<Button-1>", self.set_object("entrance"))
+        self.prohibited_button.bind("<Button-1>", self.set_object("entrance"))
 
         # Canvas and other initialization
 
@@ -71,6 +79,9 @@ class ParkLayout:
             self.current_border = Border(self.canvas)
         elif text == "entrance":
             self.current_object = "entrance"
+        elif text == "prohibited":
+            self.current_object = "prohibited"
+            self.current_prohibited = ProhibitedZone(self.canvas)
         else:
             # Handle unexpected button text (optional)
             print(f"Unknown object type: {text}")
@@ -97,19 +108,22 @@ class ParkLayout:
                 self.current_border.add_point(x, y)
                 self.objects.append(self.current_border)
         elif self.current_object == "entrance":
-            x = event.x
-            y = event.y
-            print(f'Points:{[i for i in self.current_border.points]}')
             if self.current_border:
-                print(f'Current border: {self.current_border}')  # Check if there's a selected border
-                entrance = Entrance(self.canvas, self.current_border,x,y)  # Create entrance on the selected border
-                # Entrance class now handles position calculation
-                # No need to pass click coordinates here
-                # Add entrance to objects list (assuming you have a way to draw it)
-                self.objects.append(entrance)
-                print(f"Entrance created on the border at {entrance.position}")
+                x = event.x
+                y = event.y
+                entrance = Entrance(self.canvas, self.current_border, x, y)  # Create entrance
             else:
                 print("Please select a border to create an entrance")
+        elif self.current_object == "prohibited":
+            x = event.x
+            y = event.y
+            print('test')
+            if self.current_prohibited:  # Check if a current border exists
+                self.current_prohibited.add_point(x, y)  # Add point to the current border
+            else:
+                self.current_prohibited = ProhibitedZone(self.canvas)  # Create a new border on first click
+                self.current_prohibited.add_point(x, y)
+                self.objects.append(self.current_prohibited)
             
     # def finalize_current_border(self, event):
     # # Check if there's a current border
@@ -124,3 +138,6 @@ class ParkLayout:
 # Create and run the ParkLayout object
 park_layout = ParkLayout()
 park_layout.run()
+
+#TODO Selector Tool
+#TODO Preview before placing

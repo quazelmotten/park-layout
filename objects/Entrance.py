@@ -1,87 +1,45 @@
-from shapely.geometry import Polygon, Point, LineString
 from ParkObject import ParkObject
+from math import sqrt, dist
 
-class Entrance:
-  def __init__(self, canvas, border, x, y, position=None):
+class Entrance(ParkObject):
+  def __init__(self, canvas, border, x, y):
     self.canvas = canvas
-    self.border = border
-    self.position = position  # Can be set to specific coordinates or None for click-based placement
+    self.border = border  # Reference to the Border object
+    if self.is_point_within_range((x,y), border.points) != False:
+      self.position = self.is_point_within_range((x,y), border.points)
+      self.draw()
+    else:
+      print(f"The point {x,y} is not within 10 units of the shape's edges.")
 
-    self.entrance_id = canvas.create_line(
-        x, y,
-        x+10, y+10,
-        width=10, fill="black"
-    )
+  def is_point_within_range(self, point, poly):
+      for i in range(len(poly)):
+        a, b = poly[i - 1], poly[i]
+        if abs(dist(a, point) + dist(b, point) - dist(a, b)) < 15:
+          print('Less than 15')
+          print(a,b)
+          self.sinL = abs(b[1]-a[1]) / abs(b[0]-a[0])
+          return self.calculate_point(a,b, point)
+      return False
 
-    if border and border.points:  # Check for border and points
-      border_points = []
-      for i in border.points:
-        border_points.append(i)
-      self.border_polygon = Polygon(border_points)  # Create Shapely polygon
-
-#   def calculate_entrance_point(self, click_point):
-#     """
-#     Calculates the entrance point directly below the click point on the border.
-
-#     Args:
-#         click_point: A tuple (x, y) representing the click coordinates.
-
-#     Returns:
-#         A tuple (x, y) representing the entrance position on the border,
-#         or None if no valid intersection is found below the click.
-#     """
-#     if not self.border_polygon:
-#       return None  # No polygon to calculate with
-
-#     click_line = LineString([click_point, (click_point[0], float("inf"))])
-#     intersections = click_line.intersection(self.border_polygon)
-
-#     entrance_point = None
-#     for point in intersections.coords:
-#       if point[1] > click_point[1]:  # Check if Y-coordinate is below the click
-#         entrance_point = point
-#         break
-
-#     return entrance_point
-
-#   def create_entrance(self, click_point, canvas):
-#     """
-#     Creates the entrance and sets its position based on the click point or pre-defined position.
-
-#     Args:
-#         click_point: A tuple (x, y) representing the click coordinates (if position is None).
-#         canvas: The Tkinter canvas object where the entrance will be drawn.
-#     """
-#     if not self.position:  # Use click point if position is not set
-#       entrance_point = self.calculate_entrance_point(click_point)
-#       if entrance_point:
-#         self.position = entrance_point
-#       else:
-#         print("Click is not on the border or there's no intersection point below")
-#         return
-
-#     # Get the direction vector of the border segment at the entrance point
-#     offset_vector = None
-#     for i in range(len(self.border.points) - 2):
-#       if self.border.points[i] == self.position[0] and self.border.points[i + 1] == self.position[1]:
-#         # Found the border segment where the entrance is
-#         prev_point = (self.border.points[i - 2], self.border.points[i - 1])
-#         next_point = (self.border.points[i + 2], self.border.points[i + 3])
-#         offset_vector = (next_point[0] - prev_point[0], next_point[1] - prev_point[1])
-#         break
-
-#     # Create entrance line with offset based on direction vector (assuming offset of 5 pixels on each side)
-#     offset_x = offset_vector[0] / 2 if offset_vector else 0  # Handle cases with no offset vector
-#     offset_y = offset_vector[1] / 2 if offset_vector else 0
-#     entrance_line_coords = [
-#         (self.position[0] - offset_x, self.position[1] - offset_y),
-#         (self.position[0] + offset_x, self.position[1] + offset_y)
-#     ]
-
-#     # Draw the entrance line on the canvas with a width of 10 and black color
-#     self.entrance_id = canvas.create_line(
-#         entrance_line_coords[0][0], entrance_line_coords[0][1],
-#         entrance_line_coords[1][0], entrance_line_coords[1][1],
-#         width=10, fill="black"
-#     )
-#     print(f"Entrance created on the border at {self.position}")
+  def calculate_point(self, p1, p2, p3):
+    x1, y1 = p1
+    x2, y2 = p2
+    x3, y3 = p3
+    dx, dy = x2 - x1, y2 - y1
+    det = dx*dx + dy*dy
+    a = (dy * (y3 - y1) + dx * (x3 - x1))/det
+    return x1 + a * dx, y1 + a * dy
+  
+  # def calculate_sin():
+     
+  
+  
+  def draw(self):
+    """
+    Draws the entrance as a short black line on the canvas.
+    You can customize the appearance here (e.g., line width, color).
+    """
+    if self.position:
+      x, y = self.position
+      # self.canvas.create_line(x - 5, y, 5+x*self.sinL, y*sqrt(1-self.sinL**2), fill="orange", width=2)  # Short black line
+      self.canvas.create_line(x - 5, y, 5+x, y, fill="orange", width=2)
