@@ -10,7 +10,7 @@ class ParkLayout:
         self.window.title("Park Layout")
         # self.window.bind("<Return>", self.finalize_current_border)
 
-        self.current_object = None  # Initially no object selected
+        # self.current_object = None  # Initially no object selected
         self.current_border = None  # Initially no border object being created
 
         # Create menu frame
@@ -27,7 +27,7 @@ class ParkLayout:
         self.canvas.pack()
 
         # Create buttons (with icons)
-        self.current_object = "border"
+        self.current_object = None
         self.road_button = tk.Button(self.menu_frame, text="Road", image=self.road_icon, compound=tk.LEFT, command=lambda: self.set_object("road"), bg="lightgray")
         self.road_button.pack(pady=10)
         self.border_button = tk.Button(self.menu_frame, text="Border", image=self.border_icon, compound=tk.LEFT, command=lambda: self.set_object("border"), bg="lightgray")
@@ -62,7 +62,7 @@ class ParkLayout:
         # Update current_object based on the clicked button text
         if text == "road":
             self.current_object = "road"
-            self.current_border = None 
+            self.current_border = None
         elif text == "border":
             self.current_object = "border"
             self.current_border = Border(self.canvas)
@@ -76,9 +76,15 @@ class ParkLayout:
 
     def handle_click_on_canvas(self, event):
         print(event.x, event.y)
-        if self.current_object == "border":
+        if self.current_object == "road":
+            start_x = event.x
+            start_y = event.y
+            self.current_road = Road(self.canvas, start_x, start_y, None, None)  # Placeholder for end point
+            self.objects.append(self.current_road)  # Add the road to the objects list
+        elif self.current_object == "border":  
             x = event.x
             y = event.y
+            print('test')
             if self.current_border:  # Check if a current border exists
                 self.current_border.add_point(x, y)  # Add point to the current border
             else:
