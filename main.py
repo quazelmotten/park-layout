@@ -13,6 +13,9 @@ class ParkLayout:
         # self.current_object = None  # Initially no object selected
         self.current_border = None  # Initially no border object being created
         self.current_road = None
+        self.start_x = None
+        self.start_y = None
+        self.is_starting = False
         # Create menu frame
         self.menu_frame = tk.Frame(self.window, width=100, height=500, bg="lightgray")
         self.menu_frame.pack(side="left")
@@ -68,27 +71,21 @@ class ParkLayout:
             self.current_border = Border(self.canvas)
         elif text == "entrance":
             self.current_object = "entrance"
-            self.current_border = None 
         else:
             # Handle unexpected button text (optional)
             print(f"Unknown object type: {text}")
         print(self.current_object)
 
     def handle_click_on_canvas(self, event):
-        print(event.x, event.y)
         if self.current_object == "road":
-            if self.current_road is None:  # Check if it's the first click for the road
-                start_x = event.x
-                start_y = event.y
-                self.current_road = Road(self.canvas, start_x, start_y, None, None)  # Placeholder for end point
-                self.objects.append(self.current_road)  # Add the road to the objects list
+            if self.is_starting is False:
+                self.start_x = event.x
+                self.start_y = event.y
+                self.is_starting = True
+                #self, canvas, start_x, start_y, end_x, end_y, width=5, color="#000000"
             else:
-            # Update end point of existing road and redraw
-                new_x = event.x
-                new_y = event.y
-                self.current_road.update_end_point(new_x, new_y)
-                self.current_road = None  # Clear current_road to indicate road creation is complete
-  # ... rest of your code for handling other objects (border, entrance)
+                self.is_starting = False
+                self.current_road = Road(self.canvas, self.start_x, self.start_y, event.x, event.y)  
         elif self.current_object == "border":  
             x = event.x
             y = event.y
@@ -99,9 +96,21 @@ class ParkLayout:
                 self.current_border = Border(self.canvas)  # Create a new border on first click
                 self.current_border.add_point(x, y)
                 self.objects.append(self.current_border)
-        else:
-            print('test')
-
+        elif self.current_object == "entrance":
+            x = event.x
+            y = event.y
+            print(f'Points:{[i for i in self.current_border.points]}')
+            if self.current_border:
+                print(f'Current border: {self.current_border}')  # Check if there's a selected border
+                entrance = Entrance(self.canvas, self.current_border,x,y)  # Create entrance on the selected border
+                # Entrance class now handles position calculation
+                # No need to pass click coordinates here
+                # Add entrance to objects list (assuming you have a way to draw it)
+                self.objects.append(entrance)
+                print(f"Entrance created on the border at {entrance.position}")
+            else:
+                print("Please select a border to create an entrance")
+            
     # def finalize_current_border(self, event):
     # # Check if there's a current border
     #     if self.current_border:
