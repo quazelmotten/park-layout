@@ -8,6 +8,7 @@ class ParkLayout:
     def __init__(self):
         self.window = tk.Tk()
         self.window.title("Park Layout")
+        # self.window.bind("<Return>", self.finalize_current_border)
 
         self.current_object = None  # Initially no object selected
         self.current_border = None  # Initially no border object being created
@@ -57,38 +58,42 @@ class ParkLayout:
         # Get the button that was clicked
 
         # Get the text of the clicked button (lowercase for consistency)
-        clicked_object = text
 
         # Update current_object based on the clicked button text
-        if clicked_object == "road":
+        if text == "road":
             self.current_object = "road"
-        elif clicked_object == "border":
+            self.current_border = None 
+        elif text == "border":
             self.current_object = "border"
             self.current_border = Border(self.canvas)
-        elif clicked_object == "entrance":
+        elif text == "entrance":
             self.current_object = "entrance"
+            self.current_border = None 
         else:
             # Handle unexpected button text (optional)
-            print(f"Unknown object type: {clicked_object}")
+            print(f"Unknown object type: {text}")
         print(self.current_object)
 
     def handle_click_on_canvas(self, event):
-  # Check if current object is "border"
+        print(event.x, event.y)
         if self.current_object == "border":
-            # Get the click coordinates
             x = event.x
             y = event.y
-
-            # If current_border exists, add the point to it
-            if self.current_border:
+            if self.current_border:  # Check if a current border exists
+                self.current_border.add_point(x, y)  # Add point to the current border
+            else:
+                self.current_border = Border(self.canvas)  # Create a new border on first click
                 self.current_border.add_point(x, y)
-            print(x,y)
+                self.objects.append(self.current_border)
+        else:
+            print('test')
 
-# Additional code to handle finalizing the border (optional)
-    def finalize_border(self):
-        if self.current_border:
-            if self.current_border.finalize():  # Call finalize on the current border object
-                self.current_border = None  # Clear current border object (since finalized)
+    # def finalize_current_border(self, event):
+    # # Check if there's a current border
+    #     if self.current_border:
+    #         self.current_border.finalize()
+    #         self.current_border = None  # Clear current border object     
+    #         print('final')   
 
     def run(self):
         self.window.mainloop()
