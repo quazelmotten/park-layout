@@ -16,9 +16,11 @@ class ParkLayout:
         self.current_border = None  # Initially no border object being created
         self.current_road = None
         self.current_prohibited = None
+        self.current_entrance = None
         self.start_x = None
         self.start_y = None
-        self.is_starting = False
+        self.is_starting = False 
+        self.objects = []  # List to store all park objects
         # Create menu frame
         self.menu_frame = tk.Frame(self.window, width=100, height=500, bg="lightgray")
         self.menu_frame.pack(side="left")
@@ -49,15 +51,13 @@ class ParkLayout:
         self.prohibited_button = tk.Button(self.menu_frame, text="Prohibited", image=self.prohibited_icon, compound=tk.LEFT, command=lambda: self.set_object("prohibited"), bg="lightgray")
         self.prohibited_button.pack(pady=10)
         # Create buttons with proper event binding
-        self.road_button.bind("<Button-1>", self.set_object("road"))
-        self.border_button.bind("<Button-1>", self.set_object("border"))
-        self.entrance_button.bind("<Button-1>", self.set_object("entrance"))
-        self.prohibited_button.bind("<Button-1>", self.set_object("entrance"))
+        self.road_button.bind("<Button-1>", lambda:self.set_object("road"))
+        self.border_button.bind("<Button-1>", lambda:self.set_object("border"))
+        self.entrance_button.bind("<Button-1>", lambda:self.set_object("entrance"))
+        self.prohibited_button.bind("<Button-1>", lambda:self.set_object("entrance"))
 
         # Canvas and other initialization   
-
-        self.objects = []  # List to store all park objects
-
+        self.objects = []
         # Bind events
 
 
@@ -75,9 +75,18 @@ class ParkLayout:
         # Get the text of the clicked button (lowercase for consistency)
 
         # Update current_object based on the clicked button text
+        #TODO Debloat the IFs, maybe make self.current_object self.current_object_name, make current_object hold the actual object
+        if self.current_object == "road":
+            self.objects.append(self.current_road)
+        elif self.current_object == "border":
+            self.objects.append(self.current_border)
+        elif self.current_object == "entrance":
+            self.objects.append(self.current_entrance)
+        elif self.current_object == "prohibited":
+            self.objects.append(self.current_prohibited)
+        
         if text == "road":
             self.current_object = "road"
-            self.current_border = None
         elif text == "border":
             self.current_object = "border"
             self.current_border = Border(self.canvas)
@@ -118,7 +127,7 @@ class ParkLayout:
             if self.current_border:
                 x = event.x
                 y = event.y
-                entrance = Entrance(self.canvas, self.current_border, x, y)  # Create entrance
+                self.current_entrance = Entrance(self.canvas, self.current_border, x, y)  # Create entrance
             else:
                 print("Please select a border to create an entrance")
         elif self.current_object == "prohibited":
@@ -132,6 +141,7 @@ class ParkLayout:
                 self.current_prohibited.add_point(x, y)
                 self.objects.append(self.current_prohibited)
         elif self.current_object == "selector":
+            print(self.objects)
             for object in self.objects:
                 print(object.id)
                 self.canvas.tag_bind(object.id, '<Button-1>', lambda: self.selector.print_object(event,object,x,y))
