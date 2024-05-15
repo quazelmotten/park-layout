@@ -51,13 +51,14 @@ class ParkLayout:
         self.prohibited_button = tk.Button(self.menu_frame, text="Prohibited", image=self.prohibited_icon, compound=tk.LEFT, command=lambda: self.set_object("prohibited"), bg="lightgray")
         self.prohibited_button.pack(pady=10)
         # Create buttons with proper event binding
-        self.road_button.bind("<Button-1>", lambda:self.set_object("road"))
-        self.border_button.bind("<Button-1>", lambda:self.set_object("border"))
-        self.entrance_button.bind("<Button-1>", lambda:self.set_object("entrance"))
-        self.prohibited_button.bind("<Button-1>", lambda:self.set_object("entrance"))
+        # self.road_button.bind("<Button-1>", self.set_object("road"))
+        # self.border_button.bind("<Button-1>", self.set_object("border"))
+        # self.entrance_button.bind("<Button-1>", self.set_object("entrance"))
+        # self.prohibited_button.bind("<Button-1>", self.set_object("prohibited"))
+        # self.selector_button.bind("<Button-1>", self.set_object("selector"))
 
         # Canvas and other initialization   
-        self.objects = []
+        # self.objects = []
         # Bind events
 
 
