@@ -3,7 +3,7 @@ from ParkObject import ParkObject
 class Border(ParkObject):
   def __init__(self, canvas):
     self.canvas = canvas
-    self.points = []  # List to store border points
+    self.points = [] # List to store border points
     self.id = None  # Id of the border polygon
 
   def add_point(self, x, y):

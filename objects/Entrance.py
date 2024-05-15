@@ -4,13 +4,16 @@ from math import sqrt, dist
 class Entrance(ParkObject):
   def __init__(self, canvas, border, x, y):
     self.canvas = canvas
-    self.border = border  # Reference to the Border object
+    self.border = border
+    self.id = None
+    self.x = x
+    self.y = y  # Reference to the Border object
     if self.is_point_within_range((x,y), border.points) != False:
       self.position = self.is_point_within_range((x,y), border.points)
       self.draw()
     else:
       print(f"The point {x,y} is not within 10 units of the shape's edges.")
-
+  
   def is_point_within_range(self, point, poly):
       for i in range(len(poly)):
         a, b = poly[i - 1], poly[i]
@@ -42,4 +45,4 @@ class Entrance(ParkObject):
     if self.position:
       x, y = self.position
       # self.canvas.create_line(x - 5, y, 5+x*self.sinL, y*sqrt(1-self.sinL**2), fill="orange", width=2)  # Short black line
-      self.canvas.create_line(x - 5, y, 5+x, y, fill="orange", width=2)
+      self.id = self.canvas.create_line(x - 5, y, 5+x, y, fill="orange", width=2)

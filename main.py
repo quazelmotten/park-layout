@@ -4,6 +4,7 @@ from objects.Road import Road  # Import Road from the objects folder
 from objects.Border import Border
 from objects.Entrance import Entrance
 from objects.Prohibited import ProhibitedZone
+from objects.Selector import Selector
 
 class ParkLayout:
     def __init__(self):
@@ -28,6 +29,7 @@ class ParkLayout:
         self.border_icon = self.create_image("icons\\border.png")
         self.entrance_icon = self.create_image("icons\\entrance.png")
         self.prohibited_icon = self.create_image("icons\\prohibited.png")
+        self.selector_icon = self.create_image("icons\\selector.png")
 
         self.canvas = tk.Canvas(self.window, width=500, height=500)
         self.canvas.bind("<Button-1>", self.handle_click_on_canvas)
@@ -36,6 +38,8 @@ class ParkLayout:
         # Create buttons (with icons)
 
         self.current_object = None
+        self.selector_button = tk.Button(self.menu_frame, text="Selector Tool", image=self.selector_icon, compound=tk.LEFT, command=lambda: self.set_object("selector"), bg="lightgray")
+        self.selector_button.pack(pady=10)
         self.road_button = tk.Button(self.menu_frame, text="Road", image=self.road_icon, compound=tk.LEFT, command=lambda: self.set_object("road"), bg="lightgray")
         self.road_button.pack(pady=10)
         self.border_button = tk.Button(self.menu_frame, text="Border", image=self.border_icon, compound=tk.LEFT, command=lambda: self.set_object("border"), bg="lightgray")
@@ -50,7 +54,7 @@ class ParkLayout:
         self.entrance_button.bind("<Button-1>", self.set_object("entrance"))
         self.prohibited_button.bind("<Button-1>", self.set_object("entrance"))
 
-        # Canvas and other initialization
+        # Canvas and other initialization   
 
         self.objects = []  # List to store all park objects
 
@@ -82,6 +86,9 @@ class ParkLayout:
         elif text == "prohibited":
             self.current_object = "prohibited"
             self.current_prohibited = ProhibitedZone(self.canvas)
+        elif text == "selector":
+            self.current_object = "selector"
+            self.selector = Selector()
         else:
             # Handle unexpected button text (optional)
             print(f"Unknown object type: {text}")
@@ -124,6 +131,10 @@ class ParkLayout:
                 self.current_prohibited = ProhibitedZone(self.canvas)  # Create a new border on first click
                 self.current_prohibited.add_point(x, y)
                 self.objects.append(self.current_prohibited)
+        elif self.current_object == "selector":
+            for object in self.objects:
+                print(object.id)
+                self.canvas.tag_bind(object.id, '<Button-1>', lambda: self.selector.print_object(event,object,x,y))
             
     # def finalize_current_border(self, event):
     # # Check if there's a current border
