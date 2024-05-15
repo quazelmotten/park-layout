@@ -145,7 +145,7 @@ class ParkLayout:
             print(self.objects)
             for object in self.objects:
                 print(object.id)
-                self.canvas.tag_bind(object.id, '<Button-1>', lambda: self.selector.print_object(event,object,x,y))
+                self.canvas.tag_bind(object.id, '<Button-1>', self.selector.print_object(object))
             
     # def finalize_current_border(self, event):
     # # Check if there's a current border
