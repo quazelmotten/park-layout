@@ -1,12 +1,11 @@
 from objects.Border import Border
 
 class ProhibitedZone(Border):
-  def __init__(self, canvas, color="#FF0000"):  # Red color by default
-    super().__init__(canvas, color)
+  def __init__(self, canvas):  # Red color by default
+    super().__init__(canvas)
+    self.color = "#D3D3D3"
 
-  def draw(self):
-    """
-    Draws the prohibited zone using the specified color.
-    """
-    points = self.points
-    self.canvas.create_polygon(points, fill=self.color, outline=self.color)
+  def add_point(self, x, y):
+      self.points.append((x, y))
+      self.canvas.delete(self.id)
+      self.id = self.canvas.create_polygon(self.points, outline="#004D40", fill="#D3D3D3", width=2)
