@@ -6,6 +6,13 @@ from objects.Entrance import Entrance
 from objects.Prohibited import ProhibitedZone
 from objects.Selector import Selector
 
+#TODO Pivot Points
+#TODO Multiline roads
+#TODO Entrances follow the border
+#TODO Make the entrance be placeable on any border, not just the last one
+#TODO Preview before placing
+#TODO Simple simulation
+
 class ParkLayout:
     def __init__(self):
         self.window = tk.Tk()
@@ -158,6 +165,3 @@ class ParkLayout:
 # Create and run the ParkLayout object
 park_layout = ParkLayout()
 park_layout.run()
-
-#TODO Selector Tool
-#TODO Preview before placing
