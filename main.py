@@ -67,7 +67,7 @@ class ParkLayout:
     # You can use libraries like PIL (Pillow) for image manipulation
     # This function should return a PhotoImage object suitable for the button
         from PIL import Image, ImageTk  # Assuming you have PIL installed
-        image = Image.open(filename).resize((20, 20), Image.ANTIALIAS)  # Resize image to 20x20 pixels
+        image = Image.open(filename).resize((20, 20))  # Resize image to 20x20 pixels
         return ImageTk.PhotoImage(image)
 
     def set_object(self, text):
@@ -85,6 +85,8 @@ class ParkLayout:
             self.objects.append(self.current_entrance)
         elif self.current_object == "prohibited":
             self.objects.append(self.current_prohibited)
+        elif self.current_object == "selector":
+            self.canvas.unbind_all("<Button-1>")
         
         if text == "road":
             self.current_object = "road"
@@ -123,7 +125,6 @@ class ParkLayout:
             else:
                 self.current_border = Border(self.canvas)  # Create a new border on first click
                 self.current_border.add_point(x, y)
-                self.objects.append(self.current_border)
         elif self.current_object == "entrance":
             if self.current_border:
                 x = event.x
@@ -140,15 +141,17 @@ class ParkLayout:
             else:
                 self.current_prohibited = ProhibitedZone(self.canvas)  # Create a new border on first click
                 self.current_prohibited.add_point(x, y)
-                self.objects.append(self.current_prohibited)
         elif self.current_object == "selector":
             print(self.objects)
             for object in self.objects:
                 print(object.id)
-                self.canvas.tag_bind(object.id, '<Button-1>', self.selector.print_object(object))
-            
+                # self.canvas.tag_bind(object.id, '<Button-1>', self.selector.print_object(object))
+                self.canvas.tag_bind(object.id, '<Button-1>', lambda x: self.delete_object(object))
+    def delete_object(self, object):
+        self.canvas.delete(object.id)
+        self.objects.remove(object)
     # def finalize_current_border(self, event):
-    # # Check if there's a current border
+    # # Check if there's a current border+
     #     if self.current_border:
     #         self.current_border.finalize()
     #         self.current_border = None  # Clear current border object     
