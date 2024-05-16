@@ -38,7 +38,6 @@ class ParkLayout:
         self.canvas.pack()
 
         # Create buttons (with icons)
-
         self.current_object = None
         self.selector_button = tk.Button(self.menu_frame, text="Selector Tool", image=self.selector_icon, compound=tk.LEFT, command=lambda: self.set_object("selector"), bg="lightgray")
         self.selector_button.pack(pady=10)
@@ -77,12 +76,12 @@ class ParkLayout:
 
         # Update current_object based on the clicked button text
         #TODO Debloat the IFs, maybe make self.current_object self.current_object_name, make current_object hold the actual object
-        if self.current_object == "road":
-            self.objects.append(self.current_road)
-        elif self.current_object == "border":
+        # if self.current_object == "road":
+        #     self.objects.append(self.current_road)
+        if self.current_object == "border":
             self.objects.append(self.current_border)
-        elif self.current_object == "entrance":
-            self.objects.append(self.current_entrance)
+        # elif self.current_object == "entrance":
+        #     self.objects.append(self.current_entrance)
         elif self.current_object == "prohibited":
             self.objects.append(self.current_prohibited)
         elif self.current_object == "selector":
@@ -116,6 +115,7 @@ class ParkLayout:
             else:
                 self.is_starting = False
                 self.current_road = Road(self.canvas, self.start_x, self.start_y, event.x, event.y)  
+                self.objects.append(self.current_road)
         elif self.current_object == "border":  
             x = event.x
             y = event.y
@@ -129,7 +129,8 @@ class ParkLayout:
             if self.current_border:
                 x = event.x
                 y = event.y
-                self.current_entrance = Entrance(self.canvas, self.current_border, x, y)  # Create entrance
+                self.current_entrance = Entrance(self.canvas, self.current_border, x, y)
+                self.objects.append(self.current_entrance)  # Create entrance
             else:
                 print("Please select a border to create an entrance")
         elif self.current_object == "prohibited":
@@ -150,12 +151,6 @@ class ParkLayout:
     def delete_object(self, object):
         self.canvas.delete(object.id)
         self.objects.remove(object)
-    # def finalize_current_border(self, event):
-    # # Check if there's a current border+
-    #     if self.current_border:
-    #         self.current_border.finalize()
-    #         self.current_border = None  # Clear current border object     
-    #         print('final')   
 
     def run(self):
         self.window.mainloop()
