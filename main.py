@@ -93,6 +93,7 @@ class ParkLayout:
     def delete_button_press(self):
         if self.selector.selected_object:
             self.canvas.delete(self.selector.selected_object.id)
+            self.objects.remove(self.selector.selected_object)
             print(self.selector.selected_object)
         else:
             print('There\'s no object selected')
