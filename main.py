@@ -67,7 +67,7 @@ class ParkLayout:
         self.entrance_button.pack()
         self.prohibited_button = tk.Button(self.menu_frame, text="Prohibited", image=self.prohibited_icon, compound=tk.LEFT, command=lambda: self.set_object("prohibited"), bg="lightgray")
         self.prohibited_button.pack()
-        self.pivot_button = tk.Button(self.top_menu_frame, text="Pivot", image=self.pivot_icon, compound=tk.LEFT, command=lambda: self.set_object("pivot"), bg="lightgray", relief='sunken')
+        self.pivot_button = tk.Button(self.top_menu_frame, text="Pivot", image=self.pivot_icon, compound=tk.LEFT, command=self.pivot_button_press, bg="lightgray")
         self.pivot_button.pack()
     def create_image(self, filename):
     # Implement logic to create a square image from a file (considering size)
@@ -76,6 +76,14 @@ class ParkLayout:
         from PIL import Image, ImageTk  # Assuming you have PIL installed
         image = Image.open(filename).resize((20, 20))  # Resize image to 20x20 pixels
         return ImageTk.PhotoImage(image)
+
+    def pivot_button_press(self):
+        if self.pivot_points.is_sunken:
+            self.pivot_button.config(relief='sunken')
+            self.pivot_points.is_sunken=False
+        else:
+            self.pivot_button.config(relief='raised')
+            self.pivot_points.is_sunken=True
 
     def set_object(self, text):
         # Get the button that was clicked
@@ -110,8 +118,6 @@ class ParkLayout:
         elif text == "selector":
             self.current_object = "selector"
             self.selector = Selector()
-        elif text == 'pivot':
-            self.current_object = 'pivot'
         else:
             # Handle unexpected button text (optional)
             print(f"Unknown object type: {text}")
@@ -120,8 +126,8 @@ class ParkLayout:
     def handle_click_on_canvas(self, event):
         if self.current_object == "road":
             if self.is_starting is False:
-                self.start_x = event.x
-                self.start_y = event.y
+                start_points = self.pivot_points.find_closest_pivot_point(self.pivot_points.points,event.x,event.y)
+                self.start_x, self.start_y = start_points
                 self.is_starting = True
             else:
                 self.is_starting = False
@@ -129,8 +135,8 @@ class ParkLayout:
                 self.objects.append(self.current_road)
                 self.pivot_points.append_points(self.current_road.points)
         elif self.current_object == "border":  
-            x = event.x
-            y = event.y
+            start_points = self.pivot_points.find_closest_pivot_point(self.pivot_points.points,event.x,event.y)
+            x, y = start_points
             print('test')
             if self.current_border:  # Check if a current border exists
                 self.current_border.add_point(x, y)  # Add point to the current border
@@ -139,16 +145,16 @@ class ParkLayout:
                 self.current_border.add_point(x, y)
         elif self.current_object == "entrance":
             if self.current_border:
-                x = event.x
-                y = event.y
+                start_points = self.pivot_points.find_closest_pivot_point(self.pivot_points.points,event.x,event.y)
+                x, y = start_points
                 self.current_entrance = Entrance(self.canvas, self.current_border, x, y)
                 self.objects.append(self.current_entrance) 
                 self.pivot_points.append_points(self.current_entrance.points) # Create entrance
             else:
                 print("Please select a border to create an entrance")
         elif self.current_object == "prohibited":
-            x = event.x
-            y = event.y
+            start_points = self.pivot_points.find_closest_pivot_point(self.pivot_points.points,event.x,event.y)
+            x, y = start_points
             print('test')
             if self.current_prohibited:  # Check if a current border exists
                 self.current_prohibited.add_point(x, y)  # Add point to the current border
