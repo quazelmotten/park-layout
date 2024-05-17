@@ -7,9 +7,9 @@ from objects.Prohibited import ProhibitedZone
 from objects.Selector import Selector
 from objects.PivotPoints import PivotPoints
 
-#TODO Pivot Points
+#TODO Pivot Points 
 #TODO Multiline roads
-#TODO Entrances follow the border
+#TODO Entrances follow the border angle
 #TODO Make the entrance be placeable on any border, not just the last one
 #TODO Preview before placing
 #TODO Simple simulation
@@ -79,11 +79,10 @@ class ParkLayout:
 
     def pivot_button_press(self):
         if self.pivot_points.is_sunken:
-            self.pivot_button.config(relief='sunken')
-            self.pivot_points.is_sunken=False
-        else:
             self.pivot_button.config(relief='raised')
-            self.pivot_points.is_sunken=True
+        else:
+            self.pivot_button.config(relief='sunken')
+        self.pivot_points.set_sunken()
 
     def set_object(self, text):
         # Get the button that was clicked
