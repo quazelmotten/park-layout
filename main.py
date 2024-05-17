@@ -94,6 +94,7 @@ class ParkLayout:
         if self.selector.selected_object:
             self.canvas.delete(self.selector.selected_object.id)
             self.objects.remove(self.selector.selected_object)
+            self.selector.selected_object = None
             print(self.selector.selected_object)
         else:
             print('There\'s no object selected')
