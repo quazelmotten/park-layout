@@ -7,7 +7,6 @@ from objects.Prohibited import ProhibitedZone
 from objects.Selector import Selector
 from objects.PivotPoints import PivotPoints
 
-#TODO Pivot Points 
 #TODO Multiline roads
 #TODO Entrances follow the border angle
 #TODO Make the entrance be placeable on any border, not just the last one
@@ -29,6 +28,7 @@ class ParkLayout:
         self.start_x = None
         self.start_y = None
         self.is_starting = False 
+        self.selector = Selector()
         self.objects = []
         self.pivot_points = PivotPoints()  # List to store all park objects
         # Create menu frame
@@ -39,6 +39,8 @@ class ParkLayout:
         self.top_menu_frame.pack(side='top', anchor='nw')
         self.menu_frame = tk.Frame(self.window, width=100, height=1080, bg="lightgray")
         self.menu_frame.pack(side="top", anchor='nw')
+        # self.text_field = tk.Text(height='25',state='disabled')
+        # self.text_field.pack(side='bottom',anchor='sw')
         # self.config(menu=self.menu)
         
 
@@ -50,6 +52,7 @@ class ParkLayout:
         self.prohibited_icon = self.create_image("icons\\prohibited.png")
         self.selector_icon = self.create_image("icons\\selector.png")
         self.pivot_icon = self.create_image("icons\\pivot.png")
+        self.delete_icon = self.create_image("icons\\delete.png")
 
         self.canvas = tk.Canvas(self.window, width=1920, height=1080)
         self.canvas.bind("<Button-1>", self.handle_click_on_canvas)
@@ -69,6 +72,9 @@ class ParkLayout:
         self.prohibited_button.pack()
         self.pivot_button = tk.Button(self.top_menu_frame, text="Pivot", image=self.pivot_icon, compound=tk.LEFT, command=self.pivot_button_press, bg="lightgray")
         self.pivot_button.pack()
+        self.delete_button = tk.Button(self.top_menu_frame, text="Delete", image=self.delete_icon, compound=tk.LEFT, command=self.delete_button_press, bg="lightgray")
+        self.delete_button.pack(anchor='e')
+    
     def create_image(self, filename):
     # Implement logic to create a square image from a file (considering size)
     # You can use libraries like PIL (Pillow) for image manipulation
@@ -83,6 +89,13 @@ class ParkLayout:
         else:
             self.pivot_button.config(relief='sunken')
         self.pivot_points.set_sunken()
+    
+    def delete_button_press(self):
+        if self.selector.selected_object:
+            self.canvas.delete(self.selector.selected_object.id)
+            print(self.selector.selected_object)
+        else:
+            print('There\'s no object selected')
 
     def set_object(self, text):
         # Get the button that was clicked
@@ -109,6 +122,8 @@ class ParkLayout:
         elif text == "border":
             self.current_object = "border"
             self.current_border = Border(self.canvas)
+            self.text_field.config(state='normal')
+            self.text_field.insert('end',f'Current border:{self.current_border}')
         elif text == "entrance":
             self.current_object = "entrance"
         elif text == "prohibited":
@@ -116,7 +131,6 @@ class ParkLayout:
             self.current_prohibited = ProhibitedZone(self.canvas)
         elif text == "selector":
             self.current_object = "selector"
-            self.selector = Selector()
         else:
             # Handle unexpected button text (optional)
             print(f"Unknown object type: {text}")
@@ -164,8 +178,8 @@ class ParkLayout:
             print(self.objects)
             for object in self.objects:
                 print(object.id)
-                # self.canvas.tag_bind(object.id, '<Button-1>', self.selector.print_object(object))
-                self.canvas.tag_bind(object.id, '<Button-1>', lambda x: self.delete_object(object))
+                self.canvas.tag_bind(object.id, '<Button-1>', self.selector.print_object(object))
+                # self.canvas.tag_bind(object.id, '<Button-1>', lambda x: self.delete_object(object))
         elif self.current_object == 'pivot':
             print(f'Pivot Points:{self.pivot_points.points}')
     def delete_object(self, object):
