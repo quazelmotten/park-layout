@@ -5,6 +5,7 @@ from objects.Border import Border
 from objects.Entrance import Entrance
 from objects.Prohibited import ProhibitedZone
 from objects.Selector import Selector
+from objects.PivotPoints import PivotPoints
 
 #TODO Pivot Points
 #TODO Multiline roads
@@ -17,6 +18,7 @@ class ParkLayout:
     def __init__(self):
         self.window = tk.Tk()
         self.window.title("Park Layout")
+        self.window.state('zoomed')
         # self.window.bind("<Return>", self.finalize_current_border)
 
         # self.current_object = None  # Initially no object selected
@@ -27,10 +29,18 @@ class ParkLayout:
         self.start_x = None
         self.start_y = None
         self.is_starting = False 
-        self.objects = []  # List to store all park objects
+        self.objects = []
+        self.pivot_points = PivotPoints()  # List to store all park objects
         # Create menu frame
-        self.menu_frame = tk.Frame(self.window, width=100, height=500, bg="lightgray")
-        self.menu_frame.pack(side="left")
+        # self.menu = tk.Menu(self)
+        # self.file_menu = tk.Menu(self.menu, tearoff=0)
+        # self.file_menu.add_command(label="Новый файл")
+        self.top_menu_frame = tk.Frame(self.window, width=1920, height=25, bg="lightgray")
+        self.top_menu_frame.pack(side='top', anchor='nw')
+        self.menu_frame = tk.Frame(self.window, width=100, height=1080, bg="lightgray")
+        self.menu_frame.pack(side="top", anchor='nw')
+        # self.config(menu=self.menu)
+        
 
         #TODO Remove the bloat
         # Load button icons
@@ -39,35 +49,26 @@ class ParkLayout:
         self.entrance_icon = self.create_image("icons\\entrance.png")
         self.prohibited_icon = self.create_image("icons\\prohibited.png")
         self.selector_icon = self.create_image("icons\\selector.png")
+        self.pivot_icon = self.create_image("icons\\pivot.png")
 
-        self.canvas = tk.Canvas(self.window, width=500, height=500)
+        self.canvas = tk.Canvas(self.window, width=1920, height=1080)
         self.canvas.bind("<Button-1>", self.handle_click_on_canvas)
         self.canvas.pack()
 
         # Create buttons (with icons)
         self.current_object = None
         self.selector_button = tk.Button(self.menu_frame, text="Selector Tool", image=self.selector_icon, compound=tk.LEFT, command=lambda: self.set_object("selector"), bg="lightgray")
-        self.selector_button.pack(pady=10)
+        self.selector_button.pack()
         self.road_button = tk.Button(self.menu_frame, text="Road", image=self.road_icon, compound=tk.LEFT, command=lambda: self.set_object("road"), bg="lightgray")
-        self.road_button.pack(pady=10)
+        self.road_button.pack()
         self.border_button = tk.Button(self.menu_frame, text="Border", image=self.border_icon, compound=tk.LEFT, command=lambda: self.set_object("border"), bg="lightgray")
-        self.border_button.pack(pady=10)
+        self.border_button.pack()
         self.entrance_button = tk.Button(self.menu_frame, text="Entrance", image=self.entrance_icon, compound=tk.LEFT, command=lambda: self.set_object("entrance"), bg="lightgray")
-        self.entrance_button.pack(pady=10)
+        self.entrance_button.pack()
         self.prohibited_button = tk.Button(self.menu_frame, text="Prohibited", image=self.prohibited_icon, compound=tk.LEFT, command=lambda: self.set_object("prohibited"), bg="lightgray")
-        self.prohibited_button.pack(pady=10)
-        # Create buttons with proper event binding
-        # self.road_button.bind("<Button-1>", self.set_object("road"))
-        # self.border_button.bind("<Button-1>", self.set_object("border"))
-        # self.entrance_button.bind("<Button-1>", self.set_object("entrance"))
-        # self.prohibited_button.bind("<Button-1>", self.set_object("prohibited"))
-        # self.selector_button.bind("<Button-1>", self.set_object("selector"))
-
-        # Canvas and other initialization   
-        # self.objects = []
-        # Bind events
-
-
+        self.prohibited_button.pack()
+        self.pivot_button = tk.Button(self.top_menu_frame, text="Pivot", image=self.pivot_icon, compound=tk.LEFT, command=lambda: self.set_object("pivot"), bg="lightgray", relief='sunken')
+        self.pivot_button.pack()
     def create_image(self, filename):
     # Implement logic to create a square image from a file (considering size)
     # You can use libraries like PIL (Pillow) for image manipulation
@@ -87,10 +88,12 @@ class ParkLayout:
         #     self.objects.append(self.current_road)
         if self.current_object == "border":
             self.objects.append(self.current_border)
+            self.pivot_points.append_points(self.current_border.points)
         # elif self.current_object == "entrance":
         #     self.objects.append(self.current_entrance)
         elif self.current_object == "prohibited":
             self.objects.append(self.current_prohibited)
+            self.pivot_points.append_points(self.current_prohibited.points)
         elif self.current_object == "selector":
             self.canvas.unbind_all("<Button-1>")
         
@@ -107,6 +110,8 @@ class ParkLayout:
         elif text == "selector":
             self.current_object = "selector"
             self.selector = Selector()
+        elif text == 'pivot':
+            self.current_object = 'pivot'
         else:
             # Handle unexpected button text (optional)
             print(f"Unknown object type: {text}")
@@ -118,11 +123,11 @@ class ParkLayout:
                 self.start_x = event.x
                 self.start_y = event.y
                 self.is_starting = True
-                #self, canvas, start_x, start_y, end_x, end_y, width=5, color="#000000"
             else:
                 self.is_starting = False
                 self.current_road = Road(self.canvas, self.start_x, self.start_y, event.x, event.y)  
                 self.objects.append(self.current_road)
+                self.pivot_points.append_points(self.current_road.points)
         elif self.current_object == "border":  
             x = event.x
             y = event.y
@@ -137,7 +142,8 @@ class ParkLayout:
                 x = event.x
                 y = event.y
                 self.current_entrance = Entrance(self.canvas, self.current_border, x, y)
-                self.objects.append(self.current_entrance)  # Create entrance
+                self.objects.append(self.current_entrance) 
+                self.pivot_points.append_points(self.current_entrance.points) # Create entrance
             else:
                 print("Please select a border to create an entrance")
         elif self.current_object == "prohibited":
@@ -155,6 +161,8 @@ class ParkLayout:
                 print(object.id)
                 # self.canvas.tag_bind(object.id, '<Button-1>', self.selector.print_object(object))
                 self.canvas.tag_bind(object.id, '<Button-1>', lambda x: self.delete_object(object))
+        elif self.current_object == 'pivot':
+            print(f'Pivot Points:{self.pivot_points.points}')
     def delete_object(self, object):
         self.canvas.delete(object.id)
         self.objects.remove(object)
