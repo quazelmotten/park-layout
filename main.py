@@ -12,11 +12,18 @@ from objects.PivotPoints import PivotPoints
 #TODO Make the entrance be placeable on any border, not just the last one
 #TODO Preview before placing
 #TODO Simple simulation
+#TODO Fix roads not pivoting twice in a row (Pivots to first point but no the second point)
+#TODO Small color change for borders and objects so that you could differentiate them
+#TODO Highlight the selected object (for example, the red outline)
+#TODO Pivot point highlight 
+#TODO Sink active buttons
+#TODO Top Menu
 
 class ParkLayout:
     def __init__(self):
         self.window = tk.Tk()
         self.window.title("Park Layout")
+        self.window.geometry("1920x1080")
         self.window.state('zoomed')
         # self.window.bind("<Return>", self.finalize_current_border)
 
@@ -35,10 +42,37 @@ class ParkLayout:
         # self.menu = tk.Menu(self)
         # self.file_menu = tk.Menu(self.menu, tearoff=0)
         # self.file_menu.add_command(label="Новый файл")
-        self.top_menu_frame = tk.Frame(self.window, width=1920, height=25, bg="lightgray")
-        self.top_menu_frame.pack(side='top', anchor='nw')
-        self.menu_frame = tk.Frame(self.window, width=100, height=1080, bg="lightgray")
-        self.menu_frame.pack(side="top", anchor='nw')
+
+        top_left_square_size = 110
+        self.window.grid_rowconfigure(1, weight=1)
+        self.window.grid_columnconfigure(1, weight=1)
+
+        self.top_left_square = tk.Frame(self.window, width=top_left_square_size, height=25, bg="grey")
+        self.top_left_square.grid(row=0, column=0)
+        self.ui_label = tk.Label(self.top_left_square, text="Park Layout")
+        self.ui_label.pack()
+
+        # Create top menu frame
+        self.top_menu_frame = tk.Frame(self.window, height=top_left_square_size, highlightbackground="black", highlightthickness=1, bg="lightblue")
+        self.top_menu_frame.grid(row=0, column=1, sticky="ew")
+
+        # Create left menu frame
+        self.left_menu_frame = tk.Frame(self.window, width=top_left_square_size, highlightbackground="black", highlightthickness=1, bg="lightgray")
+        self.left_menu_frame.grid(row=1, column=0, sticky="ns")
+
+        # Create bottom text frame
+        self.bottom_text_frame = tk.Frame(self.window, height=25, bg="lightgreen")
+        self.bottom_text_frame.grid(row=2, column=0, columnspan=2, sticky="ew")
+
+        # Create center canvas frame
+        self.center_frame = tk.Frame(self.window)
+        self.center_frame.grid(row=1, column=1, sticky="nsew")
+
+        # Create the canvas
+        self.canvas = tk.Canvas(self.center_frame, bg="white")
+        self.canvas.bind("<Button-1>", self.handle_click_on_canvas)
+        self.canvas.pack(expand=True, fill="both")
+
         # self.text_field = tk.Text(height='25',state='disabled')
         # self.text_field.pack(side='bottom',anchor='sw')
         # self.config(menu=self.menu)
@@ -54,26 +88,24 @@ class ParkLayout:
         self.pivot_icon = self.create_image("icons\\pivot.png")
         self.delete_icon = self.create_image("icons\\delete.png")
 
-        self.canvas = tk.Canvas(self.window, width=1920, height=1080)
-        self.canvas.bind("<Button-1>", self.handle_click_on_canvas)
-        self.canvas.pack()
+        button_width = 100
 
         # Create buttons (with icons)
         self.current_object = None
-        self.selector_button = tk.Button(self.menu_frame, text="Selector Tool", image=self.selector_icon, compound=tk.LEFT, command=lambda: self.set_object("selector"), bg="lightgray")
-        self.selector_button.pack()
-        self.road_button = tk.Button(self.menu_frame, text="Road", image=self.road_icon, compound=tk.LEFT, command=lambda: self.set_object("road"), bg="lightgray")
+        self.selector_button = tk.Button(self.top_menu_frame, text="Selector Tool", image=self.selector_icon, compound=tk.LEFT, command=lambda: self.set_object("selector"), bg="lightgray", width=button_width)
+        self.selector_button.pack(side=tk.LEFT)
+        self.road_button = tk.Button(self.left_menu_frame, text="Road", image=self.road_icon, compound=tk.LEFT, command=lambda: self.set_object("road"), bg="lightgray", width=button_width)
         self.road_button.pack()
-        self.border_button = tk.Button(self.menu_frame, text="Border", image=self.border_icon, compound=tk.LEFT, command=lambda: self.set_object("border"), bg="lightgray")
+        self.border_button = tk.Button(self.left_menu_frame, text="Border", image=self.border_icon, compound=tk.LEFT, command=lambda: self.set_object("border"), bg="lightgray", width=button_width)
         self.border_button.pack()
-        self.entrance_button = tk.Button(self.menu_frame, text="Entrance", image=self.entrance_icon, compound=tk.LEFT, command=lambda: self.set_object("entrance"), bg="lightgray")
+        self.entrance_button = tk.Button(self.left_menu_frame, text="Entrance", image=self.entrance_icon, compound=tk.LEFT, command=lambda: self.set_object("entrance"), bg="lightgray", width=button_width)
         self.entrance_button.pack()
-        self.prohibited_button = tk.Button(self.menu_frame, text="Prohibited", image=self.prohibited_icon, compound=tk.LEFT, command=lambda: self.set_object("prohibited"), bg="lightgray")
+        self.prohibited_button = tk.Button(self.left_menu_frame, text="Prohibited", image=self.prohibited_icon, compound=tk.LEFT, command=lambda: self.set_object("prohibited"), bg="lightgray", width=button_width)
         self.prohibited_button.pack()
-        self.pivot_button = tk.Button(self.top_menu_frame, text="Pivot", image=self.pivot_icon, compound=tk.LEFT, command=self.pivot_button_press, bg="lightgray")
-        self.pivot_button.pack()
-        self.delete_button = tk.Button(self.top_menu_frame, text="Delete", image=self.delete_icon, compound=tk.LEFT, command=self.delete_button_press, bg="lightgray")
-        self.delete_button.pack(anchor='e')
+        self.pivot_button = tk.Button(self.top_menu_frame, text="Pivot", image=self.pivot_icon, compound=tk.LEFT, command=self.pivot_button_press, bg="lightgray", width=button_width)
+        self.pivot_button.pack(side=tk.LEFT)
+        self.delete_button = tk.Button(self.top_menu_frame, text="Delete", image=self.delete_icon, compound=tk.LEFT, command=self.delete_button_press, bg="lightgray", width=button_width)
+        self.delete_button.pack(side=tk.LEFT)
     
     def create_image(self, filename):
     # Implement logic to create a square image from a file (considering size)
@@ -187,6 +219,8 @@ class ParkLayout:
     def delete_object(self, object):
         self.canvas.delete(object.id)
         self.objects.remove(object)
+        for point in object.points:
+            self.pivot_points.remove(point)
 
     def run(self):
         self.window.mainloop()
