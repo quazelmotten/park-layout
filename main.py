@@ -139,6 +139,8 @@ class ParkLayout:
         if isinstance(self.selector.selected_object, Border):
             self.canvas.delete(self.selector.selected_object.id)
             self.objects.remove(self.selector.selected_object)
+            for point in self.selector.selected_object.points:
+                self.pivot_points.points.remove(point)
             for entrance in self.selector.selected_object.entrances:
                 self.canvas.delete(entrance.id)
                 self.objects.remove(entrance)
@@ -147,6 +149,8 @@ class ParkLayout:
         elif self.selector.selected_object:
             self.canvas.delete(self.selector.selected_object.id)
             self.objects.remove(self.selector.selected_object)
+            for point in self.selector.selected_object.points:
+                self.pivot_points.points.remove(point)
             self.selector.selected_object = None
             print(self.selector.selected_object)
         else:
