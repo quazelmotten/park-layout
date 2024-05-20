@@ -7,7 +7,6 @@ from objects.Prohibited import ProhibitedZone
 from objects.Selector import Selector
 from objects.PivotPoints import PivotPoints
 
-#TODO Multiline roads
 #TODO Entrances follow the border angle
 #TODO Preview before placing
 #TODO Simple simulation
@@ -185,7 +184,9 @@ class ParkLayout:
                 self.start_x, self.start_y = start_points
                 self.is_starting = True
             else:
-                self.current_road = Road(self.canvas, self.start_x, self.start_y, event.x, event.y)  
+                end_points = self.pivot_points.find_closest_pivot_point(self.pivot_points.points,event.x,event.y)
+                end_x, end_y = end_points
+                self.current_road = Road(self.canvas, self.start_x, self.start_y, end_x, end_y)  
                 self.start_x, self.start_y = event.x, event.y
                 self.objects.append(self.current_road)
                 self.pivot_points.append_points(self.current_road.points)
