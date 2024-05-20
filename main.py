@@ -187,7 +187,7 @@ class ParkLayout:
                 end_points = self.pivot_points.find_closest_pivot_point(self.pivot_points.points,event.x,event.y)
                 end_x, end_y = end_points
                 self.current_road = Road(self.canvas, self.start_x, self.start_y, end_x, end_y)  
-                self.start_x, self.start_y = event.x, event.y
+                self.start_x, self.start_y = end_points
                 self.objects.append(self.current_road)
                 self.pivot_points.append_points(self.current_road.points)
         elif self.current_object == "border":  
