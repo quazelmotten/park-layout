@@ -163,10 +163,8 @@ class ParkLayout:
             self.is_starting = False
         if self.current_object == "border":
             self.objects.append(self.current_border)
-            self.pivot_points.append_points(self.current_border.points)
         elif self.current_object == "prohibited":
             self.objects.append(self.current_prohibited)
-            self.pivot_points.append_points(self.current_prohibited.points)
         elif self.current_object == "selector":
             self.canvas.unbind_all("<Button-1>")
             self.canvas.bind("<Button-1>", lambda e: self.handle_click_on_canvas(e))
@@ -215,10 +213,11 @@ class ParkLayout:
             x, y = start_points
             print('test')
             if self.current_border:  # Check if a current border exists
-                self.current_border.add_point(x, y)  # Add point to the current border
+                self.pivot_points.points.append((x,y)) # Add point to the current border
             else:
                 self.current_border = Border(self.canvas)  # Create a new border on first click
                 self.current_border.add_point(x, y)
+            self.pivot_points.points.append((x,y))
         elif self.current_object == "entrance":
             print(self.selector.selected_object)
             # if "Border" in str(self.selector.selected_object): #isinstance
@@ -241,6 +240,7 @@ class ParkLayout:
             else:
                 self.current_prohibited = ProhibitedZone(self.canvas)  # Create a new border on first click
                 self.current_prohibited.add_point(x, y)
+            self.pivot_points.points.append((x,y))
         
                 # self.canvas.tag_bind(object.id, '<Button-1>', lambda x: self.delete_object(object))
         elif self.current_object == 'pivot':
