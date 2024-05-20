@@ -15,6 +15,9 @@ from objects.PivotPoints import PivotPoints
 #TODO Pivot point highlight 
 #TODO Sink active buttons
 #TODO Top Menu
+#TODO FIX Having to press twice to select an object
+#TODO Alt-Mode that adds the object information on top of the object (like Current Border 0x01203BVB above the border)
+#TODO Add Warning windows for no object selected, no border selected, etc
 
 class ParkLayout:
     def __init__(self):
@@ -60,8 +63,6 @@ class ParkLayout:
         self.left_menu_frame.grid(row=1, column=0, sticky="ns")
 
         # Create bottom text frame
-        self.bottom_text_frame = tk.Frame(self.window, height=25, bg="lightgreen")
-        self.bottom_text_frame.grid(row=2, column=0, columnspan=2, sticky="ew")
 
         # Create center canvas frame
         self.center_frame = tk.Frame(self.window)
@@ -71,6 +72,11 @@ class ParkLayout:
         self.canvas = tk.Canvas(self.center_frame, bg="white")
         self.canvas.bind("<Button-1>", lambda e: self.handle_click_on_canvas(e))
         self.canvas.pack(expand=True, fill="both")
+        
+        self.bottom_text_frame = tk.Frame(self.window, height=25, bg="lightgreen")
+        self.bottom_text_frame.grid(row=2, column=0, columnspan=2, sticky="ew")
+        self.status_text = tk.Text(self.bottom_text_frame, height=1, state='disabled', bg='lightgreen')
+        self.status_text.pack(fill="both",expand=True)
 
         # self.text_field = tk.Text(height='25',state='disabled')
         # self.text_field.pack(side='bottom',anchor='sw')
@@ -106,6 +112,12 @@ class ParkLayout:
         self.delete_button = tk.Button(self.top_menu_frame, text="Delete", image=self.delete_icon, compound=tk.LEFT, command=self.delete_button_press, bg="lightgray", width=button_width)
         self.delete_button.pack(side=tk.LEFT)
     
+    def update_bottom_text(self):
+        self.status_text.config(state="normal")
+        self.status_text.delete(1.0, tk.END)
+        self.status_text.insert(tk.END, f'Selected object:{self.selector.selected_object}; Current object:{self.current_object}, Pivot{' enabled' if self.pivot_points.is_sunken else ' disabled'}')
+        self.status_text.config(state='disabled')
+
     def create_image(self, filename):
     # Implement logic to create a square image from a file (considering size)
     # You can use libraries like PIL (Pillow) for image manipulation
@@ -120,6 +132,8 @@ class ParkLayout:
         else:
             self.pivot_button.config(relief='sunken')
         self.pivot_points.set_sunken()
+        self.update_bottom_text()
+
     
     def delete_button_press(self):
         if isinstance(self.selector.selected_object, Border):
@@ -130,6 +144,7 @@ class ParkLayout:
                 self.objects.remove(entrance)
             self.selector.selected_object = None
             print(self.selector.selected_object)
+            self.update_bottom_text()
         else:
             print('There\'s no object selected')
 
@@ -175,6 +190,7 @@ class ParkLayout:
             # Handle unexpected button text (optional)
             print(f"Unknown object type: {text}")
         print(self.current_object)
+        self.update_bottom_text()
 
     def handle_click_on_canvas(self, event):
         if self.current_object == "road":
@@ -228,6 +244,8 @@ class ParkLayout:
                 # self.canvas.tag_bind(object.id, '<Button-1>', lambda x: self.delete_object(object))
         elif self.current_object == 'pivot':
             print(f'Pivot Points:{self.pivot_points.points}')
+        self.update_bottom_text()
+
     def delete_object(self, object):
         self.canvas.delete(object.id)
         self.objects.remove(object)
