@@ -116,7 +116,7 @@ class ParkLayout:
     def update_bottom_text(self):
         self.status_text.config(state="normal")
         self.status_text.delete(1.0, tk.END)
-        self.status_text.insert(tk.END, f'Selected object:{self.selector.selected_object}; Current object:{self.current_object}, Pivot{' enabled' if self.pivot_points.is_sunken else ' disabled'}')
+        self.status_text.insert(tk.END, f'Selected object:{self.selector.selected_object}; Current object:{self.current_object},')
         self.status_text.config(state='disabled')
 
     def create_image(self, filename):
@@ -213,7 +213,7 @@ class ParkLayout:
             x, y = start_points
             print('test')
             if self.current_border:  # Check if a current border exists
-                self.pivot_points.points.append((x,y)) # Add point to the current border
+                self.current_border.add_point(x, y)# Add point to the current border
             else:
                 self.current_border = Border(self.canvas)  # Create a new border on first click
                 self.current_border.add_point(x, y)
