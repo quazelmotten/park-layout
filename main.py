@@ -125,9 +125,12 @@ class ParkLayout:
         self.pivot_points.set_sunken()
     
     def delete_button_press(self):
-        if self.selector.selected_object:
+        if isinstance(self.selector.selected_object, Border):
             self.canvas.delete(self.selector.selected_object.id)
             self.objects.remove(self.selector.selected_object)
+            for entrance in self.selector.selected_object.entrances:
+                self.canvas.delete(entrance.id)
+                self.objects.remove(entrance)
             self.selector.selected_object = None
             print(self.selector.selected_object)
         else:
@@ -203,6 +206,7 @@ class ParkLayout:
                 x, y = start_points
                 self.current_entrance = Entrance(self.canvas, self.current_border, x, y)
                 self.objects.append(self.current_entrance) 
+                self.current_border.entrances.append(self.current_entrance)
                 self.pivot_points.append_points(self.current_entrance.points) # Create entrance
             else:
                 print("Please select a border to create an entrance")
