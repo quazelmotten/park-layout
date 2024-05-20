@@ -18,6 +18,7 @@ from objects.PivotPoints import PivotPoints
 #TODO Pivot point highlight 
 #TODO Sink active buttons
 #TODO Top Menu
+#TODO Delete entrances with the deleted border
 
 class ParkLayout:
     def __init__(self):
@@ -32,6 +33,7 @@ class ParkLayout:
         self.current_road = None
         self.current_prohibited = None
         self.current_entrance = None
+        self.selected_object = None
         self.start_x = None
         self.start_y = None
         self.is_starting = False 
@@ -150,14 +152,16 @@ class ParkLayout:
             self.pivot_points.append_points(self.current_prohibited.points)
         elif self.current_object == "selector":
             self.canvas.unbind_all("<Button-1>")
+            self.canvas.bind("<Button-1>", self.handle_click_on_canvas)
+            
         
         if text == "road":
             self.current_object = "road"
         elif text == "border":
             self.current_object = "border"
             self.current_border = Border(self.canvas)
-            self.text_field.config(state='normal')
-            self.text_field.insert('end',f'Current border:{self.current_border}')
+            # self.text_field.config(state='normal')
+            # self.text_field.insert('end',f'Current border:{self.current_border}')
         elif text == "entrance":
             self.current_object = "entrance"
         elif text == "prohibited":
@@ -191,6 +195,9 @@ class ParkLayout:
                 self.current_border = Border(self.canvas)  # Create a new border on first click
                 self.current_border.add_point(x, y)
         elif self.current_object == "entrance":
+            print(self.selector.selected_object)
+            # if "Border" in str(self.selector.selected_object): #isinstance
+            self.current_border = self.selector.selected_object
             if self.current_border:
                 start_points = self.pivot_points.find_closest_pivot_point(self.pivot_points.points,event.x,event.y)
                 x, y = start_points
@@ -212,7 +219,7 @@ class ParkLayout:
             print(self.objects)
             for object in self.objects:
                 print(object.id)
-                self.canvas.tag_bind(object.id, '<Button-1>', self.selector.print_object(object))
+                self.canvas.tag_bind(object.id, '<Button-1>', lambda e,o=object: self.selector.print_object(e,o))
                 # self.canvas.tag_bind(object.id, '<Button-1>', lambda x: self.delete_object(object))
         elif self.current_object == 'pivot':
             print(f'Pivot Points:{self.pivot_points.points}')

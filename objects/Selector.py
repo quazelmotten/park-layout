@@ -3,7 +3,7 @@ class Selector():
         self.t = 1
         self.selected_object = None
 
-    def print_object(self, current_object):
+    def print_object(self, event, current_object):
         self.selected_object = current_object
         print(f"Current object:{self.selected_object}") 
         return
