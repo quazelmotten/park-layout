@@ -175,6 +175,10 @@ class ParkLayout:
             self.current_prohibited = ProhibitedZone(self.canvas)
         elif text == "selector":
             self.current_object = "selector"
+            print(self.objects)
+            for object in self.objects:
+                print(object.id)
+                self.canvas.tag_bind(object.id, '<Button-1>', lambda e,o=object,c=self.canvas: self.selector.print_object(e,o,canvas=c))
         else:
             # Handle unexpected button text
             print(f"Unknown object type: {text}")
@@ -229,11 +233,7 @@ class ParkLayout:
             else:
                 self.current_prohibited = ProhibitedZone(self.canvas)  # Create a new border on first click
                 self.current_prohibited.add_point(x, y)
-        elif self.current_object == "selector":
-            print(self.objects)
-            for object in self.objects:
-                print(object.id)
-                self.canvas.tag_bind(object.id, '<Button-1>', lambda e,o=object,c=self.canvas: self.selector.print_object(e,o,canvas=c))
+        
                 # self.canvas.tag_bind(object.id, '<Button-1>', lambda x: self.delete_object(object))
         elif self.current_object == 'pivot':
             print(f'Pivot Points:{self.pivot_points.points}')
