@@ -9,7 +9,6 @@ from objects.PivotPoints import PivotPoints
 
 #TODO Multiline roads
 #TODO Entrances follow the border angle
-#TODO Make the entrance be placeable on any border, not just the last one
 #TODO Preview before placing
 #TODO Simple simulation
 #TODO Fix roads not pivoting twice in a row (Pivots to first point but no the second point)
@@ -18,7 +17,6 @@ from objects.PivotPoints import PivotPoints
 #TODO Pivot point highlight 
 #TODO Sink active buttons
 #TODO Top Menu
-#TODO Delete entrances with the deleted border
 
 class ParkLayout:
     def __init__(self):
@@ -37,6 +35,7 @@ class ParkLayout:
         self.start_x = None
         self.start_y = None
         self.is_starting = False 
+        self.is_road_finalized = False
         self.selector = Selector()
         self.objects = []
         self.pivot_points = PivotPoints()  # List to store all park objects
@@ -145,6 +144,8 @@ class ParkLayout:
         #TODO Debloat the IFs, maybe make self.current_object self.current_object_name, make current_object hold the actual object
         # if self.current_object == "road":
         #     self.objects.append(self.current_road)
+        if self.current_object == "road":
+            self.is_starting = False
         if self.current_object == "border":
             self.objects.append(self.current_border)
             self.pivot_points.append_points(self.current_border.points)
@@ -184,8 +185,8 @@ class ParkLayout:
                 self.start_x, self.start_y = start_points
                 self.is_starting = True
             else:
-                self.is_starting = False
                 self.current_road = Road(self.canvas, self.start_x, self.start_y, event.x, event.y)  
+                self.start_x, self.start_y = event.x, event.y
                 self.objects.append(self.current_road)
                 self.pivot_points.append_points(self.current_road.points)
         elif self.current_object == "border":  
