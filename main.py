@@ -15,9 +15,9 @@ from objects.PivotPoints import PivotPoints
 #TODO Pivot point highlight 
 #TODO Sink active buttons
 #TODO Top Menu
-#TODO FIX Having to press twice to select an object
 #TODO Alt-Mode that adds the object information on top of the object (like Current Border 0x01203BVB above the border)
 #TODO Add Warning windows for no object selected, no border selected, etc
+#TODO Fix Delete button
 
 class ParkLayout:
     def __init__(self):
@@ -134,7 +134,6 @@ class ParkLayout:
             self.pivot_button.config(relief='sunken')
         self.pivot_points.set_sunken()
         self.update_bottom_text()
-
     
     def delete_button_press(self):
         if isinstance(self.selector.selected_object, Border):
@@ -145,9 +144,14 @@ class ParkLayout:
                 self.objects.remove(entrance)
             self.selector.selected_object = None
             print(self.selector.selected_object)
-            self.update_bottom_text()
+        elif self.selector.selected_object:
+            self.canvas.delete(self.selector.selected_object.id)
+            self.objects.remove(self.selector.selected_object)
+            self.selector.selected_object = None
+            print(self.selector.selected_object)
         else:
             print('There\'s no object selected')
+        self.update_bottom_text()
 
     def set_object(self, text):
         #TODO Debloat the IFs, maybe make self.current_object self.current_object_name, make current_object hold the actual object
