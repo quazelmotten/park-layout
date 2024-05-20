@@ -3,6 +3,7 @@ from math import inf,dist
 class PivotPoints():
     def __init__(self):
         self.points = []
+        self.highlighted_point = None
         self.is_sunken = False
     
     def __repr__(self):
@@ -26,6 +27,7 @@ class PivotPoints():
                     if dist(i,(x,y)) < min_dist:
                         min_point = i
                         min_dist = dist(i,(x,y))
+                self.highlighted_point = min_point
                 return min_point 
         return (x,y)
 

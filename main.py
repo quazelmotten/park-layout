@@ -71,6 +71,7 @@ class ParkLayout:
         # Create the canvas
         self.canvas = tk.Canvas(self.center_frame, bg="white")
         self.canvas.bind("<Button-1>", lambda e: self.handle_click_on_canvas(e))
+        self.canvas.bind("<Motion>", lambda e: self.handle_motion_on_canvas(e))
         self.canvas.pack(expand=True, fill="both")
         
         self.bottom_text_frame = tk.Frame(self.window, height=25, bg="lightgreen")
@@ -149,21 +150,12 @@ class ParkLayout:
             print('There\'s no object selected')
 
     def set_object(self, text):
-        # Get the button that was clicked
-
-        # Get the text of the clicked button (lowercase for consistency)
-
-        # Update current_object based on the clicked button text
         #TODO Debloat the IFs, maybe make self.current_object self.current_object_name, make current_object hold the actual object
-        # if self.current_object == "road":
-        #     self.objects.append(self.current_road)
         if self.current_object == "road":
             self.is_starting = False
         if self.current_object == "border":
             self.objects.append(self.current_border)
             self.pivot_points.append_points(self.current_border.points)
-        # elif self.current_object == "entrance":
-        #     self.objects.append(self.current_entrance)
         elif self.current_object == "prohibited":
             self.objects.append(self.current_prohibited)
             self.pivot_points.append_points(self.current_prohibited.points)
@@ -171,14 +163,11 @@ class ParkLayout:
             self.canvas.unbind_all("<Button-1>")
             self.canvas.bind("<Button-1>", lambda e: self.handle_click_on_canvas(e))
             
-        
         if text == "road":
             self.current_object = "road"
         elif text == "border":
             self.current_object = "border"
             self.current_border = Border(self.canvas)
-            # self.text_field.config(state='normal')
-            # self.text_field.insert('end',f'Current border:{self.current_border}')
         elif text == "entrance":
             self.current_object = "entrance"
         elif text == "prohibited":
@@ -187,10 +176,14 @@ class ParkLayout:
         elif text == "selector":
             self.current_object = "selector"
         else:
-            # Handle unexpected button text (optional)
+            # Handle unexpected button text
             print(f"Unknown object type: {text}")
         print(self.current_object)
         self.update_bottom_text()
+
+    def handle_motion_on_canvas(self, event):
+        # print(f'Motion on {event.x,event.y}')
+        return
 
     def handle_click_on_canvas(self, event):
         if self.current_object == "road":
