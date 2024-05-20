@@ -8,6 +8,7 @@ class Entrance(ParkObject):
     self.id = None
     self.x = x
     self.y = y 
+    self.color = "orange"
     self.points = [(x,y)] # Reference to the Border object
     if self.is_point_within_range((x,y), border.points) != False:
       self.position = self.is_point_within_range((x,y), border.points)

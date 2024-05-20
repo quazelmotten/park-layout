@@ -10,7 +10,6 @@ from objects.PivotPoints import PivotPoints
 #TODO Entrances follow the border angle
 #TODO Preview before placing
 #TODO Simple simulation
-#TODO Fix roads not pivoting twice in a row (Pivots to first point but no the second point)
 #TODO Small color change for borders and objects so that you could differentiate them
 #TODO Highlight the selected object (for example, the red outline)
 #TODO Pivot point highlight 
@@ -70,7 +69,7 @@ class ParkLayout:
 
         # Create the canvas
         self.canvas = tk.Canvas(self.center_frame, bg="white")
-        self.canvas.bind("<Button-1>", self.handle_click_on_canvas)
+        self.canvas.bind("<Button-1>", lambda e: self.handle_click_on_canvas(e))
         self.canvas.pack(expand=True, fill="both")
 
         # self.text_field = tk.Text(height='25',state='disabled')
@@ -155,7 +154,7 @@ class ParkLayout:
             self.pivot_points.append_points(self.current_prohibited.points)
         elif self.current_object == "selector":
             self.canvas.unbind_all("<Button-1>")
-            self.canvas.bind("<Button-1>", self.handle_click_on_canvas)
+            self.canvas.bind("<Button-1>", lambda e: self.handle_click_on_canvas(e))
             
         
         if text == "road":
@@ -225,7 +224,7 @@ class ParkLayout:
             print(self.objects)
             for object in self.objects:
                 print(object.id)
-                self.canvas.tag_bind(object.id, '<Button-1>', lambda e,o=object: self.selector.print_object(e,o))
+                self.canvas.tag_bind(object.id, '<Button-1>', lambda e,o=object,c=self.canvas: self.selector.print_object(e,o,canvas=c))
                 # self.canvas.tag_bind(object.id, '<Button-1>', lambda x: self.delete_object(object))
         elif self.current_object == 'pivot':
             print(f'Pivot Points:{self.pivot_points.points}')

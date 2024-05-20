@@ -6,11 +6,12 @@ class Border(ParkObject):
     self.entrances = []
     self.points = [] # List to store border points
     self.id = None  # Id of the border polygon
+    self.color = "#80CBC4"
 
   def add_point(self, x, y):
     self.points.append((x, y))
     self.canvas.delete(self.id)
-    self.id = self.canvas.create_polygon(self.points, outline="#004D40", fill="#80CBC4", width=2)  # Create updated polygon
+    self.id = self.canvas.create_polygon(self.points, outline="#004D40", fill=self.color, width=2)  # Create updated polygon
 
   def handle_click(self, event):
     # This function won't be called directly anymore (event handling managed elsewhere)
