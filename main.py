@@ -175,12 +175,12 @@ class ParkLayout:
             for object in self.objects:
                 self.canvas.tag_unbind(object.id, '<Button-1>')
             self.canvas.bind("<Button-1>", lambda e: self.handle_click_on_canvas(e))
-        self.is_placing = False
         if text == "road":
             self.current_object = "road"
         elif text == "border":
             self.current_object = "border"
             self.current_border = Border(self.canvas)
+            self.is_placing = True
         elif text == "entrance":
             self.current_object = "entrance"
         elif text == "prohibited":
@@ -213,8 +213,12 @@ class ParkLayout:
                 start_points = self.pivot_points.find_closest_pivot_point(self.pivot_points.points,event.x,event.y)
                 x, y = start_points
                 self.temp_entrance = Entrance(self.canvas, self.selector.selected_object, x, y)
-                
-        return
+            # if self.current_object == "border":
+            #     if self.temp_border:
+            #         self.canvas.delete(self.temp_border.id)
+            #     self.temp_border = Border(self.canvas, self.current_border.points)
+            #     self.temp_border.add_point(event.x, event.y)
+            #     print(event.x, event.y)
 
     def handle_click_on_canvas(self, event):
         if self.current_object == "road":
@@ -235,7 +239,7 @@ class ParkLayout:
             x, y = start_points
             print('test')
             if self.current_border:  # Check if a current border exists
-                self.current_border.add_point(x, y)# Add point to the current border
+                self.current_border.add_point(x, y)
             else:
                 self.current_border = Border(self.canvas)  # Create a new border on first click
                 self.current_border.add_point(x, y)
