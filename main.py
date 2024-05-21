@@ -78,7 +78,7 @@ class ParkLayout:
         self.canvas = tk.Canvas(self.center_frame, bg="white")
         self.canvas.bind("<Button-1>", lambda e: self.handle_click_on_canvas(e))
         self.canvas.bind("<Motion>", lambda e: self.handle_motion_on_canvas(e))
-        self.canvas.bind("<Enter>", lambda s="enter": self.set_object(s))
+        self.window.bind("<Return>", lambda e: self.set_object("enter"))
         self.canvas.pack(expand=True, fill="both")
         
         self.bottom_text_frame = tk.Frame(self.window, height=25, bg="lightgreen")
