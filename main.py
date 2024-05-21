@@ -166,7 +166,8 @@ class ParkLayout:
         elif self.current_object == "prohibited":
             self.objects.append(self.current_prohibited)
         elif self.current_object == "selector":
-            self.canvas.unbind_all("<Button-1>")
+            for object in self.objects:
+                self.canvas.tag_unbind(object.id, '<Button-1>')
             self.canvas.bind("<Button-1>", lambda e: self.handle_click_on_canvas(e))
             
         if text == "road":
