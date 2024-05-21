@@ -36,6 +36,7 @@ class ParkLayout:
         self.start_x = None
         self.start_y = None
         self.is_starting = False 
+        self.is_placing = False
         self.is_road_finalized = False
         self.selector = Selector()
         self.objects = []
@@ -44,6 +45,11 @@ class ParkLayout:
         # self.menu = tk.Menu(self)
         # self.file_menu = tk.Menu(self.menu, tearoff=0)
         # self.file_menu.add_command(label="Новый файл")
+
+        self.temp_road = None
+        self.temp_border = None
+        self.temp_prohibited = None
+        self.temp_entrance = None
 
         top_left_square_size = 110
         self.window.grid_rowconfigure(1, weight=1)
@@ -194,6 +200,13 @@ class ParkLayout:
 
     def handle_motion_on_canvas(self, event):
         # print(f'Motion on {event.x,event.y}')
+        if self.is_placing:
+            if self.current_object == "road":
+                if self.temp_road:
+                    self.canvas.delete(self.temp_road.id)
+                end_points = self.pivot_points.find_closest_pivot_point(self.pivot_points.points,event.x,event.y)
+                end_x, end_y = end_points
+                self.temp_road = Road(self.canvas, self.start_x, self.start_y, end_x, end_y)  
         return
 
     def handle_click_on_canvas(self, event):
@@ -202,6 +215,7 @@ class ParkLayout:
                 start_points = self.pivot_points.find_closest_pivot_point(self.pivot_points.points,event.x,event.y)
                 self.start_x, self.start_y = start_points
                 self.is_starting = True
+                self.is_placing = True
             else:
                 end_points = self.pivot_points.find_closest_pivot_point(self.pivot_points.points,event.x,event.y)
                 end_x, end_y = end_points
