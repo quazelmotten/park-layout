@@ -78,6 +78,7 @@ class ParkLayout:
         self.canvas = tk.Canvas(self.center_frame, bg="white")
         self.canvas.bind("<Button-1>", lambda e: self.handle_click_on_canvas(e))
         self.canvas.bind("<Motion>", lambda e: self.handle_motion_on_canvas(e))
+        self.canvas.bind("<Enter>", lambda s="enter": self.set_object(s))
         self.canvas.pack(expand=True, fill="both")
         
         self.bottom_text_frame = tk.Frame(self.window, height=25, bg="lightgreen")
@@ -167,7 +168,7 @@ class ParkLayout:
         #TODO Debloat the IFs, maybe make self.current_object self.current_object_name, make current_object hold the actual object
         if self.current_object == "road":
             self.is_starting = False
-        if self.current_object == "border":
+        elif self.current_object == "border":
             self.objects.append(self.current_border)
         elif self.current_object == "prohibited":
             self.objects.append(self.current_prohibited)
@@ -175,6 +176,12 @@ class ParkLayout:
             for object in self.objects:
                 self.canvas.tag_unbind(object.id, '<Button-1>')
             self.canvas.bind("<Button-1>", lambda e: self.handle_click_on_canvas(e))
+        
+        self.temp_entrance = None
+        self.temp_road = None
+        self.temp_prohibited = None
+        self.temp_border = None
+
         if text == "road":
             self.current_object = "road"
         elif text == "border":
@@ -192,6 +199,8 @@ class ParkLayout:
             for object in self.objects:
                 print(object.id)
                 self.canvas.tag_bind(object.id, '<Button-1>', lambda e,o=object,c=self.canvas: self.selector.print_object(e,o,canvas=c))
+        elif text == "enter":
+            self.current_object = None
         else:
             # Handle unexpected button text
             print(f"Unknown object type: {text}")
