@@ -175,7 +175,7 @@ class ParkLayout:
             for object in self.objects:
                 self.canvas.tag_unbind(object.id, '<Button-1>')
             self.canvas.bind("<Button-1>", lambda e: self.handle_click_on_canvas(e))
-            
+        self.is_placing = False
         if text == "road":
             self.current_object = "road"
         elif text == "border":
@@ -207,6 +207,13 @@ class ParkLayout:
                 end_points = self.pivot_points.find_closest_pivot_point(self.pivot_points.points,event.x,event.y)
                 end_x, end_y = end_points
                 self.temp_road = Road(self.canvas, self.start_x, self.start_y, end_x, end_y)  
+            if self.current_object == "entrance":
+                if self.temp_entrance:
+                    self.canvas.delete(self.temp_entrance.id)
+                start_points = self.pivot_points.find_closest_pivot_point(self.pivot_points.points,event.x,event.y)
+                x, y = start_points
+                self.temp_entrance = Entrance(self.canvas, self.selector.selected_object, x, y)
+                
         return
 
     def handle_click_on_canvas(self, event):
@@ -236,14 +243,17 @@ class ParkLayout:
         elif self.current_object == "entrance":
             print(self.selector.selected_object)
             # if "Border" in str(self.selector.selected_object): #isinstance
-            self.current_border = self.selector.selected_object
+            if isinstance(self.selector.selected_object, Border):
+                self.current_border = self.selector.selected_object
             if self.current_border:
+                self.is_placing=True
                 start_points = self.pivot_points.find_closest_pivot_point(self.pivot_points.points,event.x,event.y)
                 x, y = start_points
                 self.current_entrance = Entrance(self.canvas, self.current_border, x, y)
                 self.objects.append(self.current_entrance) 
                 self.current_border.entrances.append(self.current_entrance)
-                self.pivot_points.append_points(self.current_entrance.points) # Create entrance
+                self.pivot_points.append_points(self.current_entrance.points)
+                 # Create entrance
             else:
                 print("Please select a border to create an entrance")
         elif self.current_object == "prohibited":
