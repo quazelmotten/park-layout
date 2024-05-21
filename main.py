@@ -177,6 +177,15 @@ class ParkLayout:
                 self.canvas.tag_unbind(object.id, '<Button-1>')
             self.canvas.bind("<Button-1>", lambda e: self.handle_click_on_canvas(e))
         
+        if self.temp_entrance:
+            self.canvas.delete(self.temp_entrance.id)
+        elif self.temp_border:
+            self.canvas.delete(self.temp_border.id)
+        elif self.temp_prohibited:
+            self.canvas.delete(self.temp_prohibited.id)
+        elif self.temp_road:
+            self.canvas.delete(self.temp_road.id)
+
         self.temp_entrance = None
         self.temp_road = None
         self.temp_prohibited = None
