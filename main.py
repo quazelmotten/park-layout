@@ -210,9 +210,10 @@ class ParkLayout:
             if self.current_object == "entrance":
                 if self.temp_entrance:
                     self.canvas.delete(self.temp_entrance.id)
-                start_points = self.pivot_points.find_closest_pivot_point(self.pivot_points.points,event.x,event.y)
-                x, y = start_points
-                self.temp_entrance = Entrance(self.canvas, self.selector.selected_object, x, y)
+                if self.current_border:
+                    start_points = self.pivot_points.find_closest_pivot_point(self.pivot_points.points,event.x,event.y)
+                    x, y = start_points
+                    self.temp_entrance = Entrance(self.canvas, self.current_border, x, y)
             # if self.current_object == "border":
             #     if self.temp_border:
             #         self.canvas.delete(self.temp_border.id)
